@@ -87,10 +87,10 @@ class ZeroBridge(Bridge):
     return {}
 
   def _create(self):
-    zero_state = nest.map_structure(
+    return nest.map_structure(
         lambda x: tf.zeros([self.batch_size, x], dtype=tf.float32),
-        self.decoder_state_size)
-    return zero_state
+        self.decoder_state_size,
+    )
 
 
 class PassThroughBridge(Bridge):

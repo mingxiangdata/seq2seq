@@ -52,7 +52,7 @@ def _get_unk_mapping(filename):
   """
   with gfile.GFile(filename, "r") as mapping_file:
     lines = mapping_file.readlines()
-    mapping = dict([_.split("\t")[0:2] for _ in lines])
+    mapping = dict([_.split("\t")[:2] for _ in lines])
     mapping = {k.strip(): v.strip() for k, v in mapping.items()}
   return mapping
 
@@ -123,27 +123,23 @@ class DecodeText(InferenceTask):
     if self.params["postproc_fn"]:
       self._postproc_fn = locate(self.params["postproc_fn"])
       if self._postproc_fn is None:
-        raise ValueError("postproc_fn not found: {}".format(
-            self.params["postproc_fn"]))
+        raise ValueError(f'postproc_fn not found: {self.params["postproc_fn"]}')
 
   @staticmethod
   def default_params():
-    params = {}
-    params.update({
+    return dict({
         "delimiter": " ",
         "postproc_fn": "",
         "unk_replace": False,
         "unk_mapping": None,
     })
-    return params
 
   def before_run(self, _run_context):
-    fetches = {}
-    fetches["predicted_tokens"] = self._predictions["predicted_tokens"]
-    fetches["features.source_len"] = self._predictions["features.source_len"]
-    fetches["features.source_tokens"] = self._predictions[
-        "features.source_tokens"]
-
+    fetches = {
+        "predicted_tokens": self._predictions["predicted_tokens"],
+        "features.source_len": self._predictions["features.source_len"],
+        "features.source_tokens": self._predictions["features.source_tokens"],
+    }
     if "attention_scores" in self._predictions:
       fetches["attention_scores"] = self._predictions["attention_scores"]
 

@@ -64,8 +64,8 @@ def _transpose_batch_time(x):
   x_static_shape = x.get_shape()
   if x_static_shape.ndims is not None and x_static_shape.ndims < 2:
     raise ValueError(
-        "Expected input tensor %s to have rank at least 2, but saw shape: %s" %
-        (x, x_static_shape))
+        f"Expected input tensor {x} to have rank at least 2, but saw shape: {x_static_shape}"
+    )
   x_rank = array_ops.rank(x)
   x_t = array_ops.transpose(
       x, array_ops.concat(
@@ -203,11 +203,10 @@ def dynamic_decode(decoder,
     def _shape(batch_size, from_shape):
       if not isinstance(from_shape, tensor_shape.TensorShape):
         return tensor_shape.TensorShape(None)
-      else:
-        batch_size = tensor_util.constant_value(
-            ops.convert_to_tensor(
-                batch_size, name="batch_size"))
-        return tensor_shape.TensorShape([batch_size]).concatenate(from_shape)
+      batch_size = tensor_util.constant_value(
+          ops.convert_to_tensor(
+              batch_size, name="batch_size"))
+      return tensor_shape.TensorShape([batch_size]).concatenate(from_shape)
 
     def _create_ta(s, d):
       return tensor_array_ops.TensorArray(

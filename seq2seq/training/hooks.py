@@ -97,10 +97,9 @@ class MetadataCaptureHook(TrainingHook):
       return
     if not self._active:
       return tf.train.SessionRunArgs(self._global_step)
-    else:
-      tf.logging.info("Performing full trace on next step.")
-      run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE) #pylint: disable=E1101
-      return tf.train.SessionRunArgs(self._global_step, options=run_options)
+    tf.logging.info("Performing full trace on next step.")
+    run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE) #pylint: disable=E1101
+    return tf.train.SessionRunArgs(self._global_step, options=run_options)
 
   def after_run(self, _run_context, run_values):
     if not self.is_chief or self._done:
@@ -205,9 +204,7 @@ class TrainSampleHook(TrainingHook):
         dict(zip(result_dict, t)) for t in zip(*result_dict.values())
     ]
 
-    # Print results
-    result_str = ""
-    result_str += "Prediction followed by Target @ Step {}\n".format(step)
+    result_str = "" + "Prediction followed by Target @ Step {}\n".format(step)
     result_str += ("=" * 100) + "\n"
     for result in result_dicts:
       target_len = result["target_len"]
@@ -277,7 +274,7 @@ class VariableRestoreHook(TrainingHook):
       """
       prefix_parts = self.params["prefix"].split("/")
       checkpoint_prefix = "/".join(prefix_parts[:-1])
-      return name.replace(checkpoint_prefix + "/", "")
+      return name.replace(f"{checkpoint_prefix}/", "")
 
     target_names = [varname_in_checkpoint(_.op.name) for _ in variables]
     restore_map = {k: v for k, v in zip(target_names, variables)}
@@ -337,17 +334,15 @@ class SyncReplicasOptimizerHook(TrainingHook):
       raise ValueError(
           "SyncReplicasOptimizer.apply_gradient should be called before using "
           "the hook.")
+    self._ready_for_local_init_op = (
+        self._sync_optimizer.ready_for_local_init_op)
     if self.is_chief:
       self._local_init_op = self._sync_optimizer.chief_init_op
-      self._ready_for_local_init_op = (
-          self._sync_optimizer.ready_for_local_init_op)
       self._q_runner = self._sync_optimizer.get_chief_queue_runner()
       self._init_tokens_op = self._sync_optimizer.get_init_tokens_op(
           self._num_tokens)
     else:
       self._local_init_op = self._sync_optimizer.local_step_init_op
-      self._ready_for_local_init_op = (
-          self._sync_optimizer.ready_for_local_init_op)
       self._q_runner = None
       self._init_tokens_op = None
 

@@ -49,20 +49,19 @@ class DumpBeams(InferenceTask):
 
   @staticmethod
   def default_params():
-    params = {}
-    params.update({"file": "",})
-    return params
+    return {"file": ""}
 
   def before_run(self, _run_context):
-    fetches = {}
-    fetches["beam_search_output.predicted_ids"] = self._predictions[
-        "beam_search_output.predicted_ids"]
-    fetches["beam_search_output.beam_parent_ids"] = self._predictions[
-        "beam_search_output.beam_parent_ids"]
-    fetches["beam_search_output.scores"] = self._predictions[
-        "beam_search_output.scores"]
-    fetches["beam_search_output.log_probs"] = self._predictions[
-        "beam_search_output.log_probs"]
+    fetches = {
+        "beam_search_output.predicted_ids":
+        self._predictions["beam_search_output.predicted_ids"],
+        "beam_search_output.beam_parent_ids":
+        self._predictions["beam_search_output.beam_parent_ids"],
+        "beam_search_output.scores":
+        self._predictions["beam_search_output.scores"],
+        "beam_search_output.log_probs":
+        self._predictions["beam_search_output.log_probs"],
+    }
     return tf.train.SessionRunArgs(fetches)
 
   def after_run(self, _run_context, run_values):

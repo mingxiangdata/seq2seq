@@ -75,11 +75,11 @@ def create_vocabulary_lookup_table(filename, default_value=None):
       the UNK token.
     """
   if not gfile.Exists(filename):
-    raise ValueError("File does not exist: {}".format(filename))
+    raise ValueError(f"File does not exist: {filename}")
 
   # Load vocabulary into memory
   with gfile.GFile(filename) as file:
-    vocab = list(line.strip("\n") for line in file)
+    vocab = [line.strip("\n") for line in file]
   vocab_size = len(vocab)
 
   has_counts = len(vocab[0].split("\t")) == 2

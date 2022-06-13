@@ -103,16 +103,15 @@ class ModelBase(Configurable):
         staircase=self.params["optimizer.lr_staircase"])
 
     optimizer = self._create_optimizer()
-    train_op = tf.contrib.layers.optimize_loss(
+    return tf.contrib.layers.optimize_loss(
         loss=loss,
         global_step=tf.contrib.framework.get_global_step(),
         learning_rate=self.params["optimizer.learning_rate"],
         learning_rate_decay_fn=learning_rate_decay_fn,
         clip_gradients=self._clip_gradients,
         optimizer=optimizer,
-        summaries=["learning_rate", "loss", "gradients", "gradient_norm"])
-
-    return train_op
+        summaries=["learning_rate", "loss", "gradients", "gradient_norm"],
+    )
 
   @staticmethod
   def default_params():

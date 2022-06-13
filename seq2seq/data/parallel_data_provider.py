@@ -143,8 +143,7 @@ class ParallelDataProvider(data_provider.DataProvider):
           min_after_dequeue=common_queue_min,
           dtypes=[tf.string, tf.string],
           seed=seed)
-      enqueue_ops = []
-      enqueue_ops.append(shuffle_queue.enqueue([data_source, data_target]))
+      enqueue_ops = [shuffle_queue.enqueue([data_source, data_target])]
       tf.train.add_queue_runner(
           tf.train.QueueRunner(shuffle_queue, enqueue_ops))
       data_source, data_target = shuffle_queue.dequeue()

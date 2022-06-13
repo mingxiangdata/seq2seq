@@ -162,16 +162,12 @@ def get_rnn_cell(cell_class,
           output_keep_prob=dropout_output_keep_prob)
     cells.append(cell)
 
-  if len(cells) > 1:
-    final_cell = rnn_cell.ExtendedMultiRNNCell(
-        cells=cells,
-        residual_connections=residual_connections,
-        residual_combiner=residual_combiner,
-        residual_dense=residual_dense)
-  else:
-    final_cell = cells[0]
-
-  return final_cell
+  return (rnn_cell.ExtendedMultiRNNCell(
+      cells=cells,
+      residual_connections=residual_connections,
+      residual_combiner=residual_combiner,
+      residual_dense=residual_dense,
+  ) if len(cells) > 1 else cells[0])
 
 
 def create_learning_rate_decay_fn(decay_type,

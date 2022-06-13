@@ -59,9 +59,10 @@ class AttentionLayerTest(tf.test.TestCase):
 
     with self.test_session() as sess:
       sess.run(tf.global_variables_initializer())
-      feed_dict = {}
-      feed_dict[inputs_pl] = np.random.randn(self.batch_size, self.seq_len,
-                                             self.input_dim)
+      feed_dict = {
+          inputs_pl: np.random.randn(self.batch_size, self.seq_len,
+                                     self.input_dim)
+      }
       feed_dict[state_pl] = np.random.randn(self.batch_size, self.state_dim)
       feed_dict[inputs_length_pl] = np.arange(self.batch_size) + 1
       scores_, context_ = sess.run([scores, context], feed_dict)

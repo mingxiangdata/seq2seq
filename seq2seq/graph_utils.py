@@ -49,8 +49,8 @@ def add_dict_to_collection(dict_, collection_name):
     dict_: A dictionary of string keys to tensor values
     collection_name: The name of the collection to add the dictionary to
   """
-  key_collection = collection_name + "_keys"
-  value_collection = collection_name + "_values"
+  key_collection = f"{collection_name}_keys"
+  value_collection = f"{collection_name}_values"
   for key, value in dict_.items():
     tf.add_to_collection(key_collection, key)
     tf.add_to_collection(value_collection, value)
@@ -65,8 +65,8 @@ def get_dict_from_collection(collection_name):
   Returns:
     A dictionary with string keys and tensor values
   """
-  key_collection = collection_name + "_keys"
-  value_collection = collection_name + "_values"
+  key_collection = f"{collection_name}_keys"
+  value_collection = f"{collection_name}_values"
   keys = tf.get_collection(key_collection)
   values = tf.get_collection(value_collection)
   return dict(zip(keys, values))

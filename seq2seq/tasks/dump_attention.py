@@ -94,21 +94,19 @@ class DumpAttention(InferenceTask):
 
   @staticmethod
   def default_params():
-    params = {}
-    params.update({"output_dir": "", "dump_plots": True})
-    return params
+    return dict({"output_dir": "", "dump_plots": True})
 
   def begin(self):
     super(DumpAttention, self).begin()
     gfile.MakeDirs(self.params["output_dir"])
 
   def before_run(self, _run_context):
-    fetches = {}
-    fetches["predicted_tokens"] = self._predictions["predicted_tokens"]
-    fetches["features.source_len"] = self._predictions["features.source_len"]
-    fetches["features.source_tokens"] = self._predictions[
-        "features.source_tokens"]
-    fetches["attention_scores"] = self._predictions["attention_scores"]
+    fetches = {
+        "predicted_tokens": self._predictions["predicted_tokens"],
+        "features.source_len": self._predictions["features.source_len"],
+        "features.source_tokens": self._predictions["features.source_tokens"],
+        "attention_scores": self._predictions["attention_scores"],
+    }
     return tf.train.SessionRunArgs(fetches)
 
   def after_run(self, _run_context, run_values):

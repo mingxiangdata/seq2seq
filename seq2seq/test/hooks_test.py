@@ -62,8 +62,7 @@ class TestTrainSampleHook(tf.test.TestCase):
     self.sample_dir = os.path.join(self.model_dir, "samples")
 
     # The hook expects these collections to be in the graph
-    pred_dict = {}
-    pred_dict["predicted_tokens"] = tf.constant([["Hello", "World", "笑w"]])
+    pred_dict = {"predicted_tokens": tf.constant([["Hello", "World", "笑w"]])}
     pred_dict["labels.target_tokens"] = tf.constant([["Hello", "World", "笑w"]])
     pred_dict["labels.target_len"] = tf.constant(2),
     graph_utils.add_dict_to_collection(pred_dict, "predictions")
@@ -148,7 +147,8 @@ class TestMetadataCaptureHook(tf.test.TestCase):
       mon_sess.run(computation)
       self.assertEqual(
           set(gfile.ListDirectory(self.model_dir)),
-          set(["run_meta", "tfprof_log", "timeline.json"]))
+          {"run_meta", "tfprof_log", "timeline.json"},
+      )
 
 if __name__ == "__main__":
   tf.test.main()

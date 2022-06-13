@@ -65,9 +65,9 @@ def load_metadata(model_dir):
   if gfile.Exists(run_meta_path):
     with gfile.GFile(run_meta_path, "rb") as file:
       run_meta.MergeFromString(file.read())
-    print("Loaded RunMetadata from {}".format(run_meta_path))
+    print(f"Loaded RunMetadata from {run_meta_path}")
   else:
-    print("RunMetadata does not exist a {}. Skipping.".format(run_meta_path))
+    print(f"RunMetadata does not exist a {run_meta_path}. Skipping.")
 
   # Import Graph
   graph_def_path = os.path.join(model_dir, "graph.pbtxt")
@@ -79,9 +79,9 @@ def load_metadata(model_dir):
       with gfile.GFile(graph_def_path, "rb") as file:
         text_format.Parse(file.read(), graph_def)
       tf.import_graph_def(graph_def, name="")
-      print("Loaded Graph from {}".format(graph_def_path))
+      print(f"Loaded Graph from {graph_def_path}")
   else:
-    print("Graph does not exist a {}. Skipping.".format(graph_def_path))
+    print(f"Graph does not exist a {graph_def_path}. Skipping.")
 
   # Import OpLog
   op_log_path = os.path.join(model_dir, "metadata/tfprof_log")
@@ -89,9 +89,9 @@ def load_metadata(model_dir):
   if gfile.Exists(op_log_path):
     with gfile.GFile(op_log_path, "rb") as file:
       op_log.MergeFromString(file.read())
-      print("Loaded OpLog from {}".format(op_log_path))
+      print(f"Loaded OpLog from {op_log_path}")
   else:
-    print("OpLog does not exist a {}. Skipping.".format(op_log_path))
+    print(f"OpLog does not exist a {op_log_path}. Skipping.")
 
   return run_meta, graph, op_log
 
@@ -107,9 +107,7 @@ def merge_default_with_oplog(graph, op_log=None, run_meta=None):
   if not op_log:
     tmp_op_log.log_entries.extend(logged_ops.values())
   else:
-    all_ops = dict()
-    for entry in op_log.log_entries:
-      all_ops[entry.name] = entry
+    all_ops = {entry.name: entry for entry in op_log.log_entries}
     for op_name, entry in six.iteritems(logged_ops):
       if op_name in all_ops:
         all_ops[op_name].types.extend(entry.types)
@@ -198,7 +196,7 @@ def main(_argv):
         tfprof_options=params)
 
     if params["dump_to_file"] != "":
-      print("Wrote {}".format(params["dump_to_file"]))
+      print(f'Wrote {params["dump_to_file"]}')
 
 
 if __name__ == '__main__':

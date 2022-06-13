@@ -88,7 +88,7 @@ class Seq2SeqModel(ModelBase):
     predictions = {}
 
     # Add features and, if available, labels to predictions
-    predictions.update(_flatten_dict({"features": features}))
+    predictions |= _flatten_dict({"features": features})
     if labels is not None:
       predictions.update(_flatten_dict({"labels": labels}))
 
@@ -107,7 +107,7 @@ class Seq2SeqModel(ModelBase):
     predictions.update(decoder_output_flat)
 
     # If we predict the ids also map them back into the vocab and process them
-    if "predicted_ids" in predictions.keys():
+    if "predicted_ids" in predictions:
       vocab_tables = graph_utils.get_dict_from_collection("vocab_tables")
       target_id_to_vocab = vocab_tables["target_id_to_vocab"]
       predicted_tokens = target_id_to_vocab.lookup(
@@ -297,15 +297,14 @@ class Seq2SeqModel(ModelBase):
     encoder_output = self.encode(features, labels)
     decoder_output, _, = self.decode(encoder_output, features, labels)
 
+    train_op = None
     if self.mode == tf.contrib.learn.ModeKeys.INFER:
       predictions = self._create_predictions(
           decoder_output=decoder_output, features=features, labels=labels)
       loss = None
-      train_op = None
     else:
       losses, loss = self.compute_loss(decoder_output, features, labels)
 
-      train_op = None
       if self.mode == tf.contrib.learn.ModeKeys.TRAIN:
         train_op = self._build_train_op(loss)
 

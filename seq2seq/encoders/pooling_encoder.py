@@ -81,9 +81,7 @@ def _create_position_embedding(embedding_dim, num_positions, lengths, maxlen):
   # Mask out positions that are padded
   positions_mask = tf.sequence_mask(
       lengths=lengths, maxlen=maxlen, dtype=tf.float32)
-  positions_embed = pe_batch * tf.expand_dims(positions_mask, 2)
-
-  return positions_embed
+  return pe_batch * tf.expand_dims(positions_mask, 2)
 
 class PoolingEncoder(Encoder):
   """An encoder that pools over embeddings, as described in

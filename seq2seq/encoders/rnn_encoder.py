@@ -30,10 +30,7 @@ from seq2seq.training import utils as training_utils
 def _unpack_cell(cell):
   """Unpack the cells because the stack_bidirectional_dynamic_rnn
   expects a list of cells, one per layer."""
-  if isinstance(cell, tf.contrib.rnn.MultiRNNCell):
-    return cell._cells  #pylint: disable=W0212
-  else:
-    return [cell]
+  return cell._cells if isinstance(cell, tf.contrib.rnn.MultiRNNCell) else [cell]
 
 
 def _default_rnn_cell_params():

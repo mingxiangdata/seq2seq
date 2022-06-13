@@ -78,7 +78,7 @@ def moses_multi_bleu(hypotheses, references, lowercase=False):
       bleu_out = subprocess.check_output(
           bleu_cmd, stdin=read_pred, stderr=subprocess.STDOUT)
       bleu_out = bleu_out.decode("utf-8")
-      bleu_score = re.search(r"BLEU = (.+?),", bleu_out).group(1)
+      bleu_score = re.search(r"BLEU = (.+?),", bleu_out)[1]
       bleu_score = float(bleu_score)
     except subprocess.CalledProcessError as error:
       if error.output is not None:

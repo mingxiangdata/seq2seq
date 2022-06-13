@@ -116,20 +116,18 @@ class CustomHelper(Helper):
     return self._batch_size
 
   def initialize(self, name=None):
-    with ops.name_scope(name, "%sInitialize" % type(self).__name__):
+    with ops.name_scope(name, f"{type(self).__name__}Initialize"):
       (finished, next_inputs) = self._initialize_fn()
       if self._batch_size is None:
         self._batch_size = array_ops.size(finished)
     return (finished, next_inputs)
 
   def sample(self, time, outputs, state, name=None):
-    with ops.name_scope(
-        name, "%sSample" % type(self).__name__, (time, outputs, state)):
+    with ops.name_scope(name, f"{type(self).__name__}Sample", (time, outputs, state)):
       return self._sample_fn(time=time, outputs=outputs, state=state)
 
   def next_inputs(self, time, outputs, state, sample_ids, name=None):
-    with ops.name_scope(
-        name, "%sNextInputs" % type(self).__name__, (time, outputs, state)):
+    with ops.name_scope(name, f"{type(self).__name__}NextInputs", (time, outputs, state)):
       return self._next_inputs_fn(
           time=time, outputs=outputs, state=state, sample_ids=sample_ids)
 
@@ -163,8 +161,8 @@ class TrainingHelper(Helper):
           sequence_length, name="sequence_length")
       if self._sequence_length.get_shape().ndims != 1:
         raise ValueError(
-            "Expected sequence_length to be a vector, but received shape: %s" %
-            self._sequence_length.get_shape())
+            f"Expected sequence_length to be a vector, but received shape: {self._sequence_length.get_shape()}"
+        )
 
       self._zero_inputs = nest.map_structure(
           lambda inp: array_ops.zeros_like(inp[0, :]), inputs)
@@ -186,9 +184,7 @@ class TrainingHelper(Helper):
 
   def sample(self, time, outputs, name=None, **unused_kwargs):
     with ops.name_scope(name, "TrainingHelperSample", [time, outputs]):
-      sample_ids = math_ops.cast(
-          math_ops.argmax(outputs, axis=-1), dtypes.int32)
-      return sample_ids
+      return math_ops.cast(math_ops.argmax(outputs, axis=-1), dtypes.int32)
 
   def next_inputs(self, time, outputs, state, name=None, **unused_kwargs):
     """next_inputs_fn for TrainingHelper."""
@@ -339,7 +335,7 @@ class ScheduledOutputTrainingHelper(TrainingHelper):
       ValueError: if `sampling_probability` is not a scalar or vector.
     """
     with ops.name_scope(name, "ScheduledOutputTrainingHelper",
-                        [inputs, auxiliary_inputs, sampling_probability]):
+                          [inputs, auxiliary_inputs, sampling_probability]):
       self._sampling_probability = ops.convert_to_tensor(
           sampling_probability, name="sampling_probability")
       if self._sampling_probability.get_shape().ndims not in (0, 1):
@@ -368,8 +364,9 @@ class ScheduledOutputTrainingHelper(TrainingHelper):
 
       if (next_input_layer is not None and not isinstance(next_input_layer,
                                                           layers_base._Layer)):  # pylint: disable=protected-access
-        raise TypeError("next_input_layer must be a Layer, received: %s" %
-                        type(next_input_layer))
+        raise TypeError(
+            f"next_input_layer must be a Layer, received: {type(next_input_layer)}"
+        )
       self._next_input_layer = next_input_layer
 
       super(ScheduledOutputTrainingHelper, self).__init__(
@@ -495,11 +492,9 @@ class GreedyEmbeddingHelper(Helper):
     del time, state  # unused by sample_fn
     # Outputs are logits, use argmax to get the most probable id
     if not isinstance(outputs, ops.Tensor):
-      raise TypeError("Expected outputs to be a single Tensor, got: %s" %
-                      type(outputs))
-    sample_ids = math_ops.cast(
-        math_ops.argmax(outputs, axis=-1), dtypes.int32)
-    return sample_ids
+      raise TypeError(
+          f"Expected outputs to be a single Tensor, got: {type(outputs)}")
+    return math_ops.cast(math_ops.argmax(outputs, axis=-1), dtypes.int32)
 
   def next_inputs(self, time, outputs, state, sample_ids, name=None):
     """next_inputs_fn for GreedyEmbeddingHelper."""

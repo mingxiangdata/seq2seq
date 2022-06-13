@@ -47,11 +47,8 @@ def _create_from_dict(dict_, default_module, *args, **kwargs):
   it is looked up in the modules passed via `default_module`.
   """
   class_ = locate(dict_["class"]) or getattr(default_module, dict_["class"])
-  params = {}
-  if "params" in dict_:
-    params = dict_["params"]
-  instance = class_(params, *args, **kwargs)
-  return instance
+  params = dict_["params"] if "params" in dict_ else {}
+  return class_(params, *args, **kwargs)
 
 
 def _maybe_load_yaml(item):
@@ -74,9 +71,7 @@ def _deep_merge_dict(dict_x, dict_y, path=None):
     if key in dict_x:
       if isinstance(dict_x[key], dict) and isinstance(dict_y[key], dict):
         _deep_merge_dict(dict_x[key], dict_y[key], path + [str(key)])
-      elif dict_x[key] == dict_y[key]:
-        pass  # same leaf value
-      else:
+      elif dict_x[key] != dict_y[key]:
         dict_x[key] = dict_y[key]
     else:
       dict_x[key] = dict_y[key]
@@ -94,7 +89,7 @@ def _parse_params(params, default_params):
   for key, value in params.items():
     # If param is unknown, drop it to stay compatible with past versions
     if key not in default_params:
-      raise ValueError("%s is not a valid model parameter" % key)
+      raise ValueError(f"{key} is not a valid model parameter")
     # Param is a dictionary
     if isinstance(value, dict):
       default_dict = default_params[key]
@@ -102,10 +97,6 @@ def _parse_params(params, default_params):
         raise ValueError("%s should not be a dictionary", key)
       if default_dict:
         value = _parse_params(value, default_dict)
-      else:
-        # If the default is an empty dict we do not typecheck it
-        # and assume it's done downstream
-        pass
     if value is None:
       continue
     if default_params[key] is None:

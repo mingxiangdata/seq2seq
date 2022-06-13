@@ -66,11 +66,11 @@ class TFSEquenceExampleDecoder(data_decoder.DataDecoder):
 
     # Merge context and sequence features
     example = {}
-    example.update(context)
+    example |= context
     example.update(sequence)
 
     all_features = {}
-    all_features.update(self._context_keys_to_features)
+    all_features |= self._context_keys_to_features
     all_features.update(self._sequence_keys_to_features)
 
     # Reshape non-sparse elements just once:

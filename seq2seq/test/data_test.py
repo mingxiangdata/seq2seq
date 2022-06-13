@@ -101,7 +101,8 @@ class ParallelDataProviderTest(tf.test.TestCase):
 
     self.assertEqual(
         set(item_keys),
-        set(["source_tokens", "source_len", "target_tokens", "target_len"]))
+        {"source_tokens", "source_len", "target_tokens", "target_len"},
+    )
 
     with self.test_session() as sess:
       sess.run(tf.global_variables_initializer())
@@ -142,7 +143,7 @@ class ParallelDataProviderTest(tf.test.TestCase):
     item_values = data_provider.get(item_keys)
     items_dict = dict(zip(item_keys, item_values))
 
-    self.assertEqual(set(item_keys), set(["source_tokens", "source_len"]))
+    self.assertEqual(set(item_keys), {"source_tokens", "source_len"})
 
     with self.test_session() as sess:
       sess.run(tf.global_variables_initializer())

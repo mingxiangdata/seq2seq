@@ -136,8 +136,7 @@ def hyp_score(log_probs, sequence_lengths, config):
       sequence_lengths=sequence_lengths,
       penalty_factor=config.length_penalty_weight)
 
-  score = log_probs / length_penality_
-  return score
+  return log_probs / length_penality_
 
 
 def choose_top_k(scores_flat, config):

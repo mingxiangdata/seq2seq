@@ -48,19 +48,19 @@ def make_input_pipeline_from_def(def_dict, mode, **kwargs):
   Returns:
     A new InputPipeline object
   """
-  if not "class" in def_dict:
+  if "class" not in def_dict:
     raise ValueError("Input Pipeline definition must have a class property.")
 
   class_ = def_dict["class"]
   if not hasattr(sys.modules[__name__], class_):
-    raise ValueError("Invalid Input Pipeline class: {}".format(class_))
+    raise ValueError(f"Invalid Input Pipeline class: {class_}")
 
   pipeline_class = getattr(sys.modules[__name__], class_)
 
   # Constructor arguments
   params = {}
   if "params" in def_dict:
-    params.update(def_dict["params"])
+    params |= def_dict["params"]
   params.update(kwargs)
 
   return pipeline_class(params=params, mode=mode)
@@ -113,8 +113,7 @@ class InputPipeline(Configurable):
     """Utility function to read all available items from a DataProvider.
     """
     item_values = data_provider.get(list(data_provider.list_items()))
-    items_dict = dict(zip(data_provider.list_items(), item_values))
-    return items_dict
+    return dict(zip(data_provider.list_items(), item_values))
 
 
 class ParallelTextInputPipeline(InputPipeline):
@@ -181,11 +180,11 @@ class ParallelTextInputPipeline(InputPipeline):
 
   @property
   def feature_keys(self):
-    return set(["source_tokens", "source_len"])
+    return {"source_tokens", "source_len"}
 
   @property
   def label_keys(self):
-    return set(["target_tokens", "target_len"])
+    return {"target_tokens", "target_len"}
 
 
 class TFRecordInputPipeline(InputPipeline):
@@ -235,11 +234,14 @@ class TFRecordInputPipeline(InputPipeline):
             (), tf.string, default_value="")
     }
 
-    items_to_handlers = {}
-    items_to_handlers["source_tokens"] = tfexample_decoder.ItemHandlerCallback(
-        keys=[self.params["source_field"]],
-        func=lambda dict: splitter_source.decode(
-            dict[self.params["source_field"]], ["source_tokens"])[0])
+    items_to_handlers = {
+        "source_tokens":
+        tfexample_decoder.ItemHandlerCallback(
+            keys=[self.params["source_field"]],
+            func=lambda dict: splitter_source.decode(
+                dict[self.params["source_field"]], ["source_tokens"])[0],
+        )
+    }
     items_to_handlers["source_len"] = tfexample_decoder.ItemHandlerCallback(
         keys=[self.params["source_field"]],
         func=lambda dict: splitter_source.decode(
@@ -271,11 +273,11 @@ class TFRecordInputPipeline(InputPipeline):
 
   @property
   def feature_keys(self):
-    return set(["source_tokens", "source_len"])
+    return {"source_tokens", "source_len"}
 
   @property
   def label_keys(self):
-    return set(["target_tokens", "target_len"])
+    return {"target_tokens", "target_len"}
 
 
 class ImageCaptioningInputPipeline(InputPipeline):
@@ -352,8 +354,8 @@ class ImageCaptioningInputPipeline(InputPipeline):
 
   @property
   def feature_keys(self):
-    return set(["image"])
+    return {"image"}
 
   @property
   def label_keys(self):
-    return set(["target_tokens", "target_ids", "target_len"])
+    return {"target_tokens", "target_ids", "target_len"}

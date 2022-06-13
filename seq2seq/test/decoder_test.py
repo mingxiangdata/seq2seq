@@ -190,9 +190,7 @@ class BasicDecoderTest(tf.test.TestCase, DecoderTests):
   def create_decoder(self, helper, mode):
     params = BasicDecoder.default_params()
     params["max_decode_length"] = self.max_decode_length
-    decoder = BasicDecoder(params=params, mode=mode, vocab_size=self.vocab_size)
-
-    return decoder
+    return BasicDecoder(params=params, mode=mode, vocab_size=self.vocab_size)
 
 
 class AttentionDecoderTest(tf.test.TestCase, DecoderTests):

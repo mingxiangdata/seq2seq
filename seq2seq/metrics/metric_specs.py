@@ -84,8 +84,7 @@ class TextMetricSpec(Configurable, MetricSpec):
     if self.params["postproc_fn"]:
       self._postproc_fn = locate(self.params["postproc_fn"])
       if self._postproc_fn is None:
-        raise ValueError("postproc_fn not found: {}".format(
-            self.params["postproc_fn"]))
+        raise ValueError(f'postproc_fn not found: {self.params["postproc_fn"]}')
 
   @property
   def name(self):
